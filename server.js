@@ -1,6 +1,7 @@
 const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
+const cors    = require('cors');
+const dotenv  = require('dotenv');
+const path    = require('path');
 
 dotenv.config();
 
@@ -10,13 +11,17 @@ const app = express();
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.json());
 
+// Serve uploaded images as static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Routes
-app.use('/api/auth',     require('./routes/auth'));
-app.use('/api/products', require('./routes/products'));
+app.use('/api/auth',       require('./routes/auth'));
+app.use('/api/products',   require('./routes/products'));
 app.use('/api/categories', require('./routes/categories'));
-app.use('/api/cart',     require('./routes/cart'));
-app.use('/api/orders',   require('./routes/orders'));
-app.use('/api/dashboard',require('./routes/dashboard'));
+app.use('/api/cart',       require('./routes/cart'));
+app.use('/api/orders',     require('./routes/orders'));
+app.use('/api/dashboard',  require('./routes/dashboard'));
+app.use('/api/upload',     require('./routes/upload'));
 
 app.get('/', (req, res) => res.json({ message: 'ShopDB API running ✅' }));
 
