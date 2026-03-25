@@ -15,7 +15,7 @@ const pool = mysql.createPool({
 const promisePool = pool.promise();
 
 promisePool.getConnection()
-  .then(conn => { console.log('✅ MySQL connected'); conn.release(); })
-  .catch(err => console.error('❌ MySQL connection error:', err.message));
+  .then(conn => { console.log(' MySQL connected'); conn.release(); })
+  .catch(err => console.error(' MySQL connection error:', err.message));
 
 module.exports = promisePool;
