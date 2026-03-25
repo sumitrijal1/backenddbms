@@ -25,6 +25,10 @@ router.post('/', auth, async (req, res) => {
     res.json({ message: 'Added to cart' });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
+//here on duplicate key update is used to handle the case when the user tries to add a product that is 
+// already in the cart. Instead of inserting a new row, it updates the existing row by increasing the quantity. 
+// This way, we avoid having multiple entries for the same product in the cart and simply keep track of the total quantity for 
+// each product.
 
 // UPDATE quantity
 router.put('/:id', auth, async (req, res) => {
@@ -39,11 +43,16 @@ router.delete('/:id', auth, async (req, res) => {
   await db.execute('DELETE FROM cart WHERE id=? AND user_id=?', [req.params.id, req.user.id]);
   res.json({ message: 'Item removed' });
 });
+//here the reason for including user_id in the delete query is to ensure that a user can only delete items from their own cart. 
+// This is an important security measure to prevent users from deleting items from other users' carts by simply guessing the cart item ID. 
+// By checking both the cart item ID and the user ID, we ensure that only the owner of the cart can modify its contents.
 
 // CLEAR cart
 router.delete('/', auth, async (req, res) => {
   await db.execute('DELETE FROM cart WHERE user_id=?', [req.user.id]);
   res.json({ message: 'Cart cleared' });
 });
+//this delete query removes all items from the cart for the logged-in user. By specifying the user_id in the WHERE clause,
+//  we ensure that only the cart items belonging to the current user are deleted, leaving other users' carts unaffected.
 
 module.exports = router;

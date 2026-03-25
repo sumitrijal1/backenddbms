@@ -14,6 +14,7 @@ router.post('/register', async (req, res) => {
       'INSERT INTO users (name, email, password) VALUES (?,?,?)',
       [name, email, hash]
     );
+    //result.insertId contains the ID of the newly created user. We return this ID along with a success message in the response.
     res.status(201).json({ message: 'Registered successfully', id: result.insertId });
   } catch (err) {
     if (err.code === 'ER_DUP_ENTRY')
@@ -27,7 +28,13 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
     const [rows] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+    //here rows retrun all the array of users that match the provided email. Since email is unique,
+    //  we expect either an empty array (no user found) or an array with one user object.
+    
     if (!rows.length) return res.status(401).json({ error: 'Invalid credentials' });
+    //it means that if the query returns no rows, it means there is no user with the provided email, 
+    // and we respond with a 401 Unauthorized status and an error message indicating invalid credentials. 
+ 
     const user = rows[0];
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ error: 'Invalid credentials' });

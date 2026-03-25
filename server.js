@@ -23,7 +23,7 @@ app.use('/api/orders',     require('./routes/orders'));
 app.use('/api/dashboard',  require('./routes/dashboard'));
 app.use('/api/upload',     require('./routes/upload'));
 
-app.get('/', (req, res) => res.json({ message: 'ShopDB API running ✅' }));
+app.get('/', (req, res) => res.json({ message: 'ShopDB API running ' }));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(` Server running on http://localhost:${PORT}`));

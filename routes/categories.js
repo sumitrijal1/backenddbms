@@ -8,6 +8,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   const { name } = req.body;
   const [r] = await db.execute('INSERT INTO categories (name) VALUES (?)', [name]);
+  //here r is the result of the insert query, which contains the insertId of the newly created category. We return this ID along with the name in the response.
   res.status(201).json({ id: r.insertId, name });
 });
 
