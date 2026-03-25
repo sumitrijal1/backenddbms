@@ -2,8 +2,15 @@ const router = require('express').Router();
 const db = require('../db');
 const { auth, adminOnly } = require('../middleware/auth');
 
-// Place order (checkout from cart)
+// Place order (checkout from cart) — now requires delivery address
 router.post('/', auth, async (req, res) => {
+  const { full_name, phone, address_line, city, state, pincode } = req.body;
+
+  if (!full_name || !phone || !address_line || !city || !state || !pincode)
+    return res.status(400).json({ error: 'All delivery address fields are required' });
+
+  const delivery_address = `${full_name} | ${phone} | ${address_line}, ${city}, ${state} - ${pincode}`;
+
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
@@ -14,12 +21,12 @@ router.post('/', auth, async (req, res) => {
     if (!cartItems.length) return res.status(400).json({ error: 'Cart is empty' });
     for (const item of cartItems) {
       if (item.stock < item.quantity)
-        throw new Error(`Insufficient stock for product id ${item.product_id}`);
+        throw new Error(`Insufficient stock for product "${item.product_id}"`);
     }
     const total = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
     const [orderResult] = await conn.execute(
-      'INSERT INTO orders (user_id, total_amount) VALUES (?,?)',
-      [req.user.id, total]
+      'INSERT INTO orders (user_id, total_amount, delivery_address) VALUES (?,?,?)',
+      [req.user.id, total, delivery_address]
     );
     const orderId = orderResult.insertId;
     for (const item of cartItems) {
